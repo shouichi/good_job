@@ -31,6 +31,7 @@ GoodJob::Engine.routes.draw do
       get :rails_ujs, action: :rails_ujs_js
       get :chartjs, action: :chartjs_js
       get :scripts, action: :scripts_js
+      get "modules/:module", action: :modules_js, as: :modules
     end
   end
 end

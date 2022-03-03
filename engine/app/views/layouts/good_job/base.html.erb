@@ -13,9 +13,12 @@
 
   <%= javascript_include_tag bootstrap_url(format: :js, v: GoodJob::VERSION), nonce: true %>
   <%= javascript_include_tag chartjs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
-  <%= javascript_include_tag scripts_url(format: :js, v: GoodJob::VERSION), nonce: true %>
-
   <%= javascript_include_tag rails_ujs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
+
+  <%= javascript_tag type: "importmap", nonce: true do %>
+    { "imports": <%== GoodJob::AssetsController::JS_MODULES.keys.each_with_object({}) { |module_name, imports| imports[module_name] = modules_url(module_name, format: :js) }.to_json %> }
+  <% end %>
+  <%= javascript_include_tag scripts_url(format: :js, v: GoodJob::VERSION), type: "module", nonce: true %>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
