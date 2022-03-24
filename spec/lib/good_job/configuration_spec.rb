@@ -2,6 +2,16 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Configuration do
+  describe '.total_threads' do
+    before do
+      allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(2)
+    end
+
+    it 'counts up the total estimated threads' do
+      expect(described_class.total_threads).to eq 1
+    end
+  end
+
   describe '#execution_mode' do
     context 'when in development' do
       before do

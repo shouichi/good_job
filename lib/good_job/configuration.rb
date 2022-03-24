@@ -37,6 +37,24 @@ module GoodJob
     # @return [Hash]
     attr_reader :env
 
+    # Returns the maximum number of threads GoodJob might consume
+    # @param warn [Boolean] whether to print a warning when over the limit
+    # @return [Integer]
+    def self.total_threads(warn: false)
+      configuration = new({})
+
+      cron_threads = configuration.enable_cron? ? 2 : 0
+      notifier_threads = 1
+      scheduler_threads = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats[:max_threads] }
+
+      total_threads = cron_threads + notifier_threads + scheduler_threads
+
+      pool_size = ActiveRecord::Base.connection_pool&.size
+      logger.warn "GoodJob is using #{total_threads} threads, which is #{total_threads - pool_size} thread(s) more than ActiveRecord's database connection pool size of #{pool_size}. Consider increasing ActiveRecord's database connection pool size in config/database.yml." if warn && pool_size && total_threads > pool_size
+
+      total_threads
+    end
+
     # @param options [Hash] Any explicitly specified configuration options to
     #   use. Keys are symbols that match the various methods on this class.
     # @param env [Hash] A +Hash+ from which to read environment variables that
